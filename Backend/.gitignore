@@ -1,0 +1,7 @@
+__pycache__/
+uploads/
+*.mp4
+*.avi
+*.mov
+*.zip
+.env
