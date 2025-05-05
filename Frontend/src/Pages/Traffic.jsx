@@ -29,6 +29,8 @@ export default function TrafficPage() {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
       setResult(response.data)
+      setSelectedFiles([])
+      e.target.reset()
     } catch (error) {
       console.error('Error uploading files:', error)
       setResult({ error: 'Upload failed. Please try again later.' })
@@ -150,11 +152,24 @@ export default function TrafficPage() {
                 <h2 className="text-xl font-bold text-green-600 mb-2 text-center">
                   ✅ Optimization Results
                 </h2>
-                <ul className="list-disc pl-6 space-y-1">
-                  <li>🚦 North: <strong>{result.north}</strong> seconds</li>
-                  <li>🚦 South: <strong>{result.south}</strong> seconds</li>
-                  <li>🚦 West: <strong>{result.west}</strong> seconds</li>
-                  <li>🚦 East: <strong>{result.east}</strong> seconds</li>
+                <ul className="list-disc pl-6 space-y-2">
+                  {['lane1', 'lane2', 'lane3', 'lane4']
+                    .sort((a, b) => result.priority[a] - result.priority[b])
+                    .map((lane) => {
+                      const laneData = result.traffic_data.find(d => d.direction === lane);
+                      const hasAmbulance = laneData?.ambulance_detected;
+
+                      return (
+                        <li key={lane}>
+                          🚦 {lane.charAt(0).toUpperCase() + lane.slice(1)}:
+                          <strong> {result.optimized_times[lane]}s</strong> |
+                          Priority: <span className="text-blue-600 font-medium">{result.priority[lane]}</span> |
+                          Emergency: <span className={hasAmbulance ? "text-red-600 font-medium" : "text-gray-600"}>
+                            {hasAmbulance ? "Detected" : "None"}
+                          </span>
+                        </li>
+                      );
+                    })}
                 </ul>
               </div>
             )}
